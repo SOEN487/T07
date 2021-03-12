@@ -1,6 +1,16 @@
 package com.example.rest;
 
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
+
 import javax.ws.rs.*;
+import javax.ws.rs.core.Response;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
@@ -43,9 +53,14 @@ public class CustomerRestForm {
      * @param age of the customer
      */
     @POST
-    public void createCustomer(@FormParam("name") String name, @FormParam("age") int age) {
-        Customer newCustomer = new Customer(name, age);
-        customers.add(newCustomer);
+    public Response createCustomer(@HeaderParam("x-api-key") String token,
+                                   @FormParam("name") String name, @FormParam("age") int age) throws GeneralSecurityException, IOException {
+        if(validateToken(token)){
+            Customer newCustomer = new Customer(name, age);
+            customers.add(newCustomer);
+            return Response.status(Response.Status.OK).entity("Succesfully added customer!").build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity("User not authenticated!").build();
     }
 
     /**
@@ -56,15 +71,22 @@ public class CustomerRestForm {
      */
     @PUT
     @Path("{id}")
-    @Consumes("application/xml")
-    public void modifyCustomer(@PathParam("id") int id, @FormParam("name") String name, @FormParam("age") int age) {
-        Customer customer = customers.stream().filter(customer1 -> customer1.getId() == id)
-                .findFirst()
-                .orElse(null);
-        if(customer != null){
-            customer.setAge(age);
-            customer.setName(name);
+    public Response modifyCustomer(@HeaderParam("x-api-key") String token,
+                                   @PathParam("id") int id, @FormParam("name") String name, @FormParam("age") int age) {
+        if(validateToken(token)){
+            Customer customer = customers.stream().filter(customer1 -> customer1.getId() == id)
+                    .findFirst()
+                    .orElse(null);
+            if(customer != null){
+                customer.setAge(age);
+                customer.setName(name);
+                return Response.status(Response.Status.OK).entity("Succesfully modified customer!").build();
+            }
+            else{
+                return Response.status(Response.Status.OK).entity("Customer does not exist!").build();
+            }
         }
+        return Response.status(Response.Status.UNAUTHORIZED).entity("User not authenticated!").build();
     }
 
     /**
@@ -73,8 +95,40 @@ public class CustomerRestForm {
      */
     @DELETE
     @Path("{id}")
-    public void deleteCustomer(@PathParam("id") int id) {
-        customers = customers.stream().filter(customer -> customer.getId() != id)
-                .collect(Collectors.toCollection(ArrayList::new));
+    public Response deleteCustomer(@HeaderParam("x-api-key") String token, @PathParam("id") int id) {
+        if(validateToken(token)){
+            customers = customers.stream().filter(customer -> customer.getId() != id)
+                    .collect(Collectors.toCollection(ArrayList::new));
+            return Response.status(Response.Status.OK).entity("Succesfully deleted customer!").build();
+        }
+        return Response.status(Response.Status.UNAUTHORIZED).entity("User not authenticated!").build();
+    }
+
+    /**
+     * This method sends a POST request to the User API, to verify that a call is done
+     * by an authenticated user
+     * @param token generated from login
+     * @return boolean if the user is authenticated or not
+     */
+    private boolean validateToken(String token) {
+        // Setting the truststore to our server.jks file let Java trust the certificate.
+        System.setProperty("javax.net.debug", "ssl");
+        System.setProperty("javax.net.ssl.trustStore","localhost.jks");
+        System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
+
+        try (CloseableHttpClient client = HttpClients.createDefault()) {
+            HttpPost httpPost = new HttpPost(String.format("https://localhost:8080/restaurant/user/auth"));
+            httpPost.addHeader("x-api-key", token);
+            CloseableHttpResponse httpResponse = client.execute(httpPost);
+            HttpEntity entity = httpResponse.getEntity();
+            String isAuthenticated = EntityUtils.toString(entity);
+            httpResponse.close();
+            if(isAuthenticated.equals("true")){
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

@@ -40,3 +40,12 @@ click and click on "Add as Maven Project" to load up the project and start worki
 
     Clean:
         mvn clean
+
+## Curl Instructions ##
+
+    To send a curl request with the https implemented, you will need to use the .crt file that was generated.
+
+    Example:
+        curl --cacert localhost.crt https://localhost:8080/restaurant/customerform
+
+To use API with chrome you will have to import the .p12 file in chrome. The tutorial contains info on how to do that.
