@@ -1,0 +1,272 @@
+{
+	"info": {
+		"_postman_id": "95489e30-d016-457b-ac6c-8a5064dcf70f",
+		"name": "Tutorial08",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Create User",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{my_user}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{my_pass}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/user/register",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"var jsonData = JSON.parse(responseBody);\r",
+							"pm.environment.set(\"x-api-key\", jsonData.token);"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{my_user}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "{{my_pass}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/user/login",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"login"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "kosta",
+							"disabled": true
+						},
+						{
+							"key": "password",
+							"value": "1234",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Logout",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "username",
+							"value": "{{my_user}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/user/logout",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"user",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"x-api-key\",\r",
+							"    value: pm.environment.get(\"x-api-key\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "{{customer_name}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "{{customer_age}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/customerform",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"customerform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Get Customers",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/customerform",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"customerform"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Modify Customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"x-api-key\",\r",
+							"    value: pm.environment.get(\"x-api-key\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "{{customer_name}}",
+							"type": "text"
+						},
+						{
+							"key": "age",
+							"value": "100",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{app_url}}/customerform/{{customer_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"customerform",
+						"{{customer_id}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Delete Customer",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.request.headers.add({\r",
+							"    key: \"x-api-key\",\r",
+							"    value: pm.environment.get(\"x-api-key\")\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{app_url}}/customerform/{{customer_id}}",
+					"host": [
+						"{{app_url}}"
+					],
+					"path": [
+						"customerform",
+						"{{customer_id}}"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
