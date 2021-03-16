@@ -15,7 +15,7 @@ import java.net.URI;
  */
 public class Main {
     // Base URI the Grizzly HTTP server will listen on
-    public static final String BASE_URI = "https://0.0.0.0:8080/restaurant/";
+    public static final String BASE_URI = "https://0.0.0.0:8443/restaurant/";
     private static final String KEYSTORE_LOC = "localhost.jks";
     private static final String KEYSTORE_PASS = "changeit";
 

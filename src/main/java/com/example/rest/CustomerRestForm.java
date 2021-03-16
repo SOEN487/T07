@@ -117,7 +117,7 @@ public class CustomerRestForm {
         System.setProperty("javax.net.ssl.trustStorePassword", "changeit");
 
         try (CloseableHttpClient client = HttpClients.createDefault()) {
-            HttpPost httpPost = new HttpPost(String.format("https://localhost:8080/restaurant/user/auth"));
+            HttpPost httpPost = new HttpPost(String.format("https://localhost:8443/restaurant/user/auth"));
             httpPost.addHeader("x-api-key", token);
             CloseableHttpResponse httpResponse = client.execute(httpPost);
             HttpEntity entity = httpResponse.getEntity();
